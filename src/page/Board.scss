@@ -1,0 +1,58 @@
+// 棋盘
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10%;
+  .row {
+    display: flex;
+    direction: row;
+    justify-content: center;
+    align-content: center;
+    .cell {
+      width: 17px;
+      height: 17px;
+      margin: 0;
+      padding: 7px;
+      border: 1px dashed #ccc;
+    }
+    &:nth-child(1) {
+      border-top: 2px solid #777;
+    }
+    &:nth-child(3n) {
+      border-bottom: 2px solid #777;
+    }
+    & .cell:first-child {
+      border-left: 2px solid #777;
+    }
+    & .cell:nth-child(3n) {
+      border-right: 2px solid #777;
+    }
+  }
+}
+
+// 高亮
+.tmp-page {
+  color: blue;
+  .origin {
+    background-color: rgba(240, 240, 240, 0.6);
+    color: #666;
+    opacity: 0.9;
+  }
+  .highlight {
+    background-color: rgba(#ffe901, 0.2);
+  }
+  .filter {
+    background-color: rgba(#ffe901, 0.4);
+  }
+  .chosen {
+    background-color: rgba(#ffe901, 0.6) !important;
+  }
+  .conflict {
+    color: red;
+  }
+  .origin.conflict {
+    color: #ea4335;
+  }
+}

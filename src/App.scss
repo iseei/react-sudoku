@@ -1,28 +1,57 @@
 .App {
   text-align: center;
+  .App-header {
+    background-color: #222;
+    height: 70px;
+    padding: 15px;
+    color: white;
+  }
+  .App-title {
+    font-size: 1.5em;
+  }
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+/*数字组*/
+.choices {
+  display: flex;
+  direction: row;
+  justify-content: center;
+  align-content: center;
+  margin-top: 5px;
+  margin-bottom: 20px;
+  .choice {
+    width: 35px;
+    height: 35px;
+    border: 1px dashed #ccc;
+    background: rgba(0, 0, 0, 0.2);
+    font-size: 1.2em;
+    color: #1fb27f;
+    border: 1px dashed rgba(251, 255, 254, 0.8);
+    border-radius: 50%;
+    padding: 0;
+    cursor: pointer;
+  }
 }
 
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
-}
-
-.App-title {
-  font-size: 1.5em;
-}
-
-.App-intro {
-  font-size: large;
-}
-
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+// 按钮组
+.contrls {
+  display: flex;
+  justify-content: space-around;
+  max-width: 300px;
+  margin: 0 auto;
+  button {
+    color: #666;
+    font-size: 9.6px;
+    height: 24px;
+    line-height: 24px;
+    padding: 0 16px;
+    border-radius: 4px;
+    background-color: #eee;
+    border: 0.5px #eee solid;
+  }
+  button:focus {
+    background-color: #ddd;
+    text-decoration: none;
+    outline: none;
+  }
 }

@@ -1,19 +1,157 @@
 import * as React from 'react';
 import './App.scss';
+import { Board } from './page/Board';
+import SudokuGenerator from './SudokuGenerator';
+import Sudo from "./Sudokus";
 
-import logo from './logo.svg';
+export interface IState {
+  list: number[][],             // sudoke数组
+  record: number[][],           // 步骤记录
+  origin: Set<string>,          // 原始棋盘
+  chosenCell: [number, number], // 当前选中单元格
+}
+class App extends React.Component<{}, IState> {
 
-class App extends React.Component {
+  UNSAFE_componentWillMount() {
+    // console.log('UNSAFE_componentWillMount');
+    this.startNewGame();
+  }
+
+  /**
+   * 新开一局游戏
+   *
+   */
+  startNewGame = () => {
+    const grid = Sudo.easy[Math.floor(Math.random() * Sudo.easy.length)];
+    const ll = new SudokuGenerator(grid).generate();
+    const _list = ll[0];
+    const origin: Set<string> = new Set()
+    _list.forEach((rows, i) => {
+      rows.forEach((n, j) => {
+        n && origin.add(i + '' + j);
+      })
+    });
+    this.setState({
+      list: _list,
+      record: [],
+      origin: origin,
+    })
+  }
+
+  /**
+   * 重置游戏
+   *
+   */
+  restartGame = () => {
+    this.state.record.forEach(item => { this.state.list[item[0]][item[1]] = 0; });
+    this.setState({
+      'list': this.state.list,
+      'record': [],
+    });
+  }
+
+  /**
+   * 回退
+   *
+   */
+  back = () => {
+    if (this.state.record.length) {
+      let lastRecord: number[] = this.state.record[this.state.record.length - 1];
+      this.state.list[lastRecord[0]][lastRecord[1]] = 0;
+      this.state.record.pop();
+      if (this.state.record.length) {
+        let preRecord: number[] = this.state.record[this.state.record.length - 1];
+        this.state.list[preRecord[0]][preRecord[1]] = preRecord[2];
+      }
+      this.setState({
+        'list': this.state.list,
+      })
+    }
+  }
+
+  /**
+   * 选中棋盘cell
+   *
+   * @param {number} row
+   * @param {number} col
+   */
+  handleCellClick = (row: number, col: number) => {
+    // console.log('App-handleCellClick', row, col);
+    this.setState({ chosenCell: [row, col] });
+  }
+
+  /**
+   * 清除cell
+   *
+   */
+  clearCell = () => {
+    let _list: any[][] = this.state.list.slice();
+    let _cell = this.state.chosenCell;
+    if (_cell && !this.isOrigin(_cell[0], _cell[1])) {
+      _list[_cell[0]][_cell[1]] = 0;
+      this.setState({ list: _list });
+    }
+  }
+
+  /**
+   * 判断是否是初始单元格
+   *
+   * @param {number} i
+   * @param {number} j
+   * @returns {boolean}
+   */
+  isOrigin(i: number, j: number): boolean {
+    return this.state.origin.has('' + i + j);
+  }
+
+
+  /**
+   * 点选1-9数字
+   *
+   * @param {any} num
+   */
+  handleNumsClick = (num: any) => {
+    let list: any[][] = this.state.list.slice();
+    let _cell = this.state.chosenCell;
+    if (_cell && !this.isOrigin(_cell[0], _cell[1])) {
+      list[_cell[0]][_cell[1]] = num;
+      this.setState({ 'list': list });
+      this.state.record.push([_cell[0], _cell[1], num]);
+    }
+  }
+
   public render() {
+    const choices = [...'123456789'].map(i => {
+      const _i = Number(i)
+      return <button key={_i} className="choice" value={_i} onClick={() => this.handleNumsClick(_i)}>{_i}</button>
+    });
+
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
+          <h1 className="App-title">React数独</h1>
         </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.tsx</code> and save to reload.
-        </p>
+
+        {/* 棋盘 */}
+        <Board list={this.state.list}
+          cellClick={this.handleCellClick}
+          origin={this.state.origin}
+        />
+
+        {/* 数字选择 */}
+        <div className="choices">
+          {choices}
+        </div>
+
+        {/* 按钮 */}
+        <div className="contrls">
+          <button onClick={this.startNewGame}>新开一局</button>
+          <button onClick={this.restartGame}>重置</button>
+          <button onClick={this.back}>回退</button>
+          <button onClick={this.clearCell}>清除</button>
+        </div>
+
+
       </div>
     );
   }
