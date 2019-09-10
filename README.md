@@ -1,4 +1,8 @@
-## 初始化项目
+# react数独游戏
 
-create-react-app sudoku --scripts-version=react-scripts-ts
+
+
+npm i
+
+npm start
 
