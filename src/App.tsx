@@ -9,6 +9,7 @@ export interface IState {
   record: number[][],           // 步骤记录
   origin: Set<string>,          // 原始棋盘
   chosenCell: [number, number], // 当前选中单元格
+  disabledNums: number[]
 }
 class App extends React.Component<{}, IState> {
 
@@ -77,7 +78,11 @@ class App extends React.Component<{}, IState> {
    */
   handleCellClick = (row: number, col: number) => {
     // console.log('App-handleCellClick', row, col);
-    this.setState({ chosenCell: [row, col] });
+    let disabledNums = this.checkDisabledNums(row, col);
+    this.setState({
+      chosenCell: [row, col],
+      disabledNums: disabledNums
+    });
   }
 
   /**
@@ -104,6 +109,45 @@ class App extends React.Component<{}, IState> {
     return this.state.origin.has('' + i + j);
   }
 
+  /**
+   * 禁用/可填入数字判断
+   *
+   * @param {number} i
+   * @param {number} j
+   * @returns {number[]}
+   * @memberof App
+   */
+  checkDisabledNums(i: number, j: number): number[] {
+    let values = this.state.list
+    let _enable = new Set<number>([1, 2, 3, 4, 5, 6, 7, 8, 9])
+    let _disabled = new Set<number>();
+    for (let k = 0; k <= 8; k++) {
+      if (values[i][k] && k !== j) {
+        _enable.delete(values[i][k]);
+        _disabled.add(values[i][k]);
+      }
+    }
+    for (let k = 0; k <= 8; k++) {
+      if (values[k][j] && k !== i) {
+        _enable.delete(values[k][j]);
+        _disabled.add(values[k][j]);
+      }
+    }
+    let bi = Math.floor(i / 3) * 3
+      , bj = Math.floor(j / 3) * 3
+    for (let m = bi; m < bi + 3; m++) {
+      for (let n = bj; n < bj + 3; n++) {
+        if (m === i && n === j) { continue }
+        if (values[m][n]) {
+          _enable.delete(values[m][n]);
+          _disabled.add(values[m][n]);
+        }
+      }
+    }
+    // console.log('禁用判断', _enable, _disabled);
+    return Array.from(_disabled);
+  }
+
 
   /**
    * 点选1-9数字
@@ -121,10 +165,19 @@ class App extends React.Component<{}, IState> {
   }
 
   public render() {
-    const choices = [...'123456789'].map(i => {
-      const _i = Number(i)
-      return <button key={_i} className="choice" value={_i} onClick={() => this.handleNumsClick(_i)}>{_i}</button>
-    });
+    let disabledNums = new Set(this.state.disabledNums || []);
+
+    const choices = [...'123456789'].map(
+      i => {
+        const _i = Number(i);
+        let className = 'choice';
+        let isDisabled: boolean = false;
+        if (disabledNums.has(_i)) {
+          className += ' disabled';
+          isDisabled = true
+        }
+        return <button key={_i} className={className} disabled={isDisabled} value={_i} onClick={() => this.handleNumsClick(_i)}>{_i}</button>
+      });
 
     return (
       <div className="App">
